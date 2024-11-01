@@ -1,7 +1,5 @@
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
-using NodaTime;
-using Xunit;
 using Xunit.Abstractions;
 using YahooQuotesObservable;
 namespace YahooQuotesApi.Tests;
@@ -31,6 +29,23 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         Assert.Equal(symbol, pricingData.Id);
     }
 
+    [Fact(Skip = "Too Slow")]
+    public async Task Exampple()
+    {
+        // Create the observable.
+        IObservable<PricingData> observable = YahooQuotes.CreateObservable(["AAPL", "EURUSD=X"]);
+
+        // Subscribe to the observable.
+        IDisposable subscription = observable.Subscribe(onNext: pricingData =>
+        {
+            Write($"Id: {pricingData.Id}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
+        });
+
+        await Task.Delay(TimeSpan.FromSeconds(10));
+
+        // Unsubscribe from the observable.
+        subscription.Dispose();
+    }
 
 }
 

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System;
 using System.Reactive.Linq;
 using System.Net.WebSockets;
 using System.Net;
@@ -33,14 +32,16 @@ public static class YahooQuotes
                 await webSocket.ConnectAsync(new Uri("wss://streamer.finance.yahoo.com/"),
                     new HttpMessageInvoker(httpHandler), ct).ConfigureAwait(false);
                 if (webSocket.State != WebSocketState.Open)
-                    throw new WebSocketException("WebSocketState is not open.");
+                    throw new WebSocketException("WebSocketState is not be open.");
 
-                await webSocket.SendAsync(Encoding.UTF8.GetBytes(requestMessage), WebSocketMessageType.Text, true, ct).ConfigureAwait(false);
-                Console.WriteLine($"Sent request: {requestMessage}");
+                await webSocket.SendAsync(Encoding.UTF8.GetBytes(requestMessage), WebSocketMessageType.Text, true, ct)
+                    .ConfigureAwait(false);
 
                 while (true)
                 {
                     WebSocketReceiveResult response = await webSocket.ReceiveAsync(responseBuffer, ct).ConfigureAwait(false);
+                    if (!response.EndOfMessage)
+                        throw new WebSocketException("The response message is not complete.");
                     string responseMessage = Encoding.UTF8.GetString(responseBuffer, 0, response.Count);
                     byte[] bytes = Convert.FromBase64String(responseMessage);
                     PricingData pricingData = Serializer.Deserialize<PricingData>((ReadOnlySpan<byte>)bytes);
@@ -49,7 +50,7 @@ public static class YahooQuotes
             }
             catch (Exception e)
             {
-                if (ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested) // unsubscribe
                     observer.OnCompleted();
                 else
                     observer.OnError(e);
