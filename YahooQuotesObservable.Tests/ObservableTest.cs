@@ -23,7 +23,7 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
     public async Task SymbolOkTest()
     {
         string symbol = "EURUSD=X";
-        IObservable<PricingData> obs = YahooQuotes.CreateObservable([symbol]).Timeout(TimeSpan.FromSeconds(10));
+        IObservable<PricingData> obs = YahooQuotes.CreateObservable([symbol]).Timeout(TimeSpan.FromSeconds(30));
         PricingData pricingData = await obs.FirstAsync();
         Write($"Id: {pricingData.Id}");
         Assert.Equal(symbol, pricingData.Id);

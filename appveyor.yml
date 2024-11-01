@@ -20,7 +20,7 @@ build:
   verbosity: minimal
   publish_nuget: true
 test_script:
-- ps: dotnet test .\YahooQuotesObservable.Test\YahooQuotesObservable.Test.csproj
+- ps: dotnet test .\YahooQuotesObservable.Tests\YahooQuotesObservable.Tests.csproj
 nuget:
   account_feed: false
   project_feed: true
