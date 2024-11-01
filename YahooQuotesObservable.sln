@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YahooQuotesObservable", "YahooQuotesObservable\YahooQuotesObservable.csproj", "{7E16B20B-0A3E-4AD0-ADD0-723EA1E4C09C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YahooQuotesObservable.Tests", "YahooQuotesObservable.Tests\YahooQuotesObservable.Tests.csproj", "{846E0E87-8C2F-4F98-BB60-773DBFE4C3D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{2C3D6BBF-886B-4D35-8D3E-B52F342E66AB}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E16B20B-0A3E-4AD0-ADD0-723EA1E4C09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E16B20B-0A3E-4AD0-ADD0-723EA1E4C09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E16B20B-0A3E-4AD0-ADD0-723EA1E4C09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E16B20B-0A3E-4AD0-ADD0-723EA1E4C09C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{846E0E87-8C2F-4F98-BB60-773DBFE4C3D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{846E0E87-8C2F-4F98-BB60-773DBFE4C3D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{846E0E87-8C2F-4F98-BB60-773DBFE4C3D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{846E0E87-8C2F-4F98-BB60-773DBFE4C3D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {05C7CF30-37CE-4FAF-8AB7-A02FE8C0F167}
+	EndGlobalSection
+EndGlobal
