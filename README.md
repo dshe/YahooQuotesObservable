@@ -9,13 +9,15 @@
 - simple and intuitive API
 - fault-tolerant
 - dependencies: protobuf-net
+- note that data is available only when the particular market is open
 
 ### Installation
 ```bash
 PM> Install-Package YahooQuotesObservable
 ```
 
-### Example
+### Examples
+#### streaming
 ```csharp
 using System.Reactive.Linq;
 using YahooQuotesObservable;
@@ -33,4 +35,16 @@ await Task.Delay(TimeSpan.FromSeconds(10));
 
 // Unsubscribe from the observable.
 subscription.Dispose();
+```
+#### snapshot
+```csharp
+string symbol = "EURUSD=X";
+
+// Create the observable.
+IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
+
+// Subscribe to the observable, wait to receive the first output, then unsubscribe.
+PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
+
+Assert.Equal(symbol, pricingData.Id);
 ```
