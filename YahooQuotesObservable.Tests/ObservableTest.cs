@@ -9,17 +9,18 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
     [Fact]
     public void BadSymbolTest()
     {
-        Assert.Throws<ArgumentException>(() => YahooQuotes.CreateObservable(["Bad Symbol"]));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => YahooQuotes.CreateObservable(["Bad Symbol"]));
+        Write(exception.Message);
     }
 
     [Fact]
     public async Task UnknownSymbolTest() // Unknown symbols are ignored -> Timeout.
     {
-        IObservable<PricingData> obs = YahooQuotes.CreateObservable(["UnknownSymbol"]).Timeout(TimeSpan.FromSeconds(5));
-        await Assert.ThrowsAsync<TimeoutException>(async () => await obs.FirstAsync());
+        IObservable<PricingData> obs = YahooQuotes.CreateObservable(["UnknownSymbol"]);
+        await Assert.ThrowsAsync<TimeoutException>(async () => await obs.FirstAsync().Timeout(TimeSpan.FromSeconds(5)));
     }
 
-    [Fact]
+    [Fact(Skip = "Timeout when market is closed")]
     public async Task SymbolOkTest()
     {
         string symbol = "EURUSD=X";
@@ -29,8 +30,8 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         Assert.Equal(symbol, pricingData.Id);
     }
 
-    [Fact(Skip = "Too Slow")]
-    public async Task Exampple()
+    [Fact(Skip = "Timeout when market is closed")]
+    public async Task StreamingExample()
     {
         // Create the observable.
         IObservable<PricingData> observable = YahooQuotes.CreateObservable(["AAPL", "EURUSD=X"]);
@@ -47,5 +48,18 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         subscription.Dispose();
     }
 
+    [Fact(Skip = "Timeout when market is closed")]
+    public async Task SnapshotExample()
+    {
+        string symbol = "EURUSD=X";
+
+        // Create the observable.
+        IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
+
+        // Subscribe to the observable, wait to receive the first output, then unsubscribe.
+        PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
+        Write($"Id: {pricingData.Id}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
+        Assert.Equal(symbol, pricingData.Id);
+    }
 }
 

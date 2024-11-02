@@ -10,8 +10,8 @@
 	<FileVersion>0.1.0</FileVersion>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<PackageIcon>worm64.png</PackageIcon>  
-	<PackageTags>yahoo finance quotes observable</PackageTags>
-	<Description>Streaming quotes from Yahooo Finance</Description>
+	<PackageTags>yahoo finance quotes streaming websocket observable</PackageTags>
+	<Description>Streaming quotes from Yahooo Finance.</Description>
 	<DebugType>embedded</DebugType>
 	<DebugSymbols>true</DebugSymbols>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
