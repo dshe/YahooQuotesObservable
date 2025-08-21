@@ -2,4 +2,4 @@
 
 [assembly: CLSCompliant(true)]
 
-[assembly: InternalsVisibleTo("YahooQuotesObservable.Test")]
+[assembly: InternalsVisibleTo("YahooQuotesObservable.Tests")]

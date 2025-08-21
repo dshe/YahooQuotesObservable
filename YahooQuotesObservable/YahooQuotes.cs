@@ -13,7 +13,7 @@ public static class YahooQuotes
     public static IObservable<PricingData> CreateObservable(Symbol symbol) => CreateObservable([symbol]);
     public static IObservable<PricingData> CreateObservable(IEnumerable<Symbol> symbols)
     {
-        HashSet<Symbol> syms = symbols.ToHashSet();
+        HashSet<Symbol> syms = [.. symbols];
         if (syms.Any(s => s.IsCurrency))
             throw new ArgumentException($"Invalid symbol: {syms.First(s => s.IsCurrency)}.");
 
@@ -32,7 +32,7 @@ public static class YahooQuotes
                 await webSocket.ConnectAsync(new Uri("wss://streamer.finance.yahoo.com/"),
                     new HttpMessageInvoker(httpHandler), ct).ConfigureAwait(false);
                 if (webSocket.State != WebSocketState.Open)
-                    throw new WebSocketException("WebSocketState is not be open.");
+                    throw new WebSocketException("WebSocketState is not open.");
 
                 await webSocket.SendAsync(Encoding.UTF8.GetBytes(requestMessage), WebSocketMessageType.Text, true, ct)
                     .ConfigureAwait(false);
@@ -50,7 +50,7 @@ public static class YahooQuotes
             }
             catch (Exception e)
             {
-                if (ct.IsCancellationRequested) // unsubscribe
+                if (ct.IsCancellationRequested) // unsubscribe from observable
                     observer.OnCompleted();
                 else
                     observer.OnError(e);
