@@ -2,7 +2,7 @@ environment:
   base_version: '0.1.2'
   version_suffix: ''
 version: $(base_version).{build}
-image: Visual Studio 2022
+image: Visual Studio 2026
 configuration: Release
 dotnet_csproj:
   patch: true

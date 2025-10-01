@@ -19,7 +19,7 @@
 	<DebugSymbols>true</DebugSymbols>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	<AnalysisMode>All</AnalysisMode>
-	<NoWarn>IDE0130;IDE0022;IDE0021;IDE0011;IDE0046</NoWarn>	  
+	<NoWarn>IDE0130;IDE0022;IDE0021;IDE0011;IDE0046;CA1031</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
