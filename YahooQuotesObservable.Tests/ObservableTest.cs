@@ -4,6 +4,8 @@ using Xunit.Abstractions;
 using YahooQuotesObservable;
 namespace YahooQuotesApi.Tests;
 
+// Note: These tests require financial markets to be open.
+
 public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, LogLevel.Trace)
 {
     [Fact]
@@ -17,7 +19,7 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
     public async Task UnknownSymbolTest() // Unknown symbols are ignored -> Timeout.
     {
         IObservable<PricingData> obs = YahooQuotes.CreateObservable(["UnknownSymbol"]);
-        await Assert.ThrowsAsync<TimeoutException>(async () => await obs.FirstAsync().Timeout(TimeSpan.FromSeconds(5)));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await obs.Timeout(TimeSpan.FromSeconds(5)).FirstAsync());
     }
 
     [Fact]
@@ -29,7 +31,8 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
 
         // Subscribe to the observable, wait to receive the first output, then unsubscribe.
-        PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
+        PricingData pricingData = await observable.Timeout(TimeSpan.FromSeconds(100000)).FirstAsync();
+
         Write($"Symbol: {pricingData.Symbol}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
         Assert.Equal(symbol, pricingData.Symbol);
         Assert.True(pricingData.Price > 0);
@@ -61,7 +64,7 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         string symbol = "EURUSD=X";
 
         IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
-        PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
+        PricingData pricingData = await observable.Timeout(TimeSpan.FromSeconds(10)).FirstAsync();
 
         foreach (var pi in typeof(PricingData).GetProperties())
         {

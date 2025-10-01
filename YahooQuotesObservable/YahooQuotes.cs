@@ -1,10 +1,17 @@
-﻿using System.Text;
-using System.Reactive.Linq;
-using System.Net.WebSockets;
+﻿using ProtoBuf;
 using System.Net;
-using ProtoBuf;
+using System.Net.WebSockets;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Text;
 namespace YahooQuotesObservable;
+
+/*
+.Net 10
+wss://streamer.finance.yahoo.com/
+ProtoBuf
+Reactive Extensions
+*/
 
 public static class YahooQuotes
 {
@@ -13,66 +20,76 @@ public static class YahooQuotes
     public static IObservable<PricingData> CreateObservable(Symbol symbol) => CreateObservable([symbol]);
     public static IObservable<PricingData> CreateObservable(IEnumerable<Symbol> symbols)
     {
-        HashSet<Symbol> syms = [.. symbols];
-        if (syms.Any(s => s.IsCurrency))
-            throw new ArgumentException($"Invalid symbol: {syms.First(s => s.IsCurrency)}.");
+        string requestMessage = CreateRequestMessage(symbols);
 
-        string requestMessage = CreateRequestMessage(syms);
-        byte[] responseBuffer = new byte[1024];
-
-        return Observable.Create<PricingData>(async (observer, ct) =>
+        return Observable.Create<PricingData>(async (observer, ct0) =>
         {
-            SocketsHttpHandler httpHandler = new();
-            ClientWebSocket webSocket = new();
-            webSocket.Options.HttpVersion = HttpVersion.Version30; // default is 1.1 or lower
-            webSocket.Options.HttpVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            bool disposed = false;
+            CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(ct0);
+            CancellationToken ct = cts.Token;
 
+            SocketsHttpHandler handler = new();
+            ClientWebSocket socket = new();
+            socket.Options.HttpVersion = HttpVersion.Version30; // default is 1.1 or lower
+            socket.Options.HttpVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             try
             {
-                await webSocket.ConnectAsync(new Uri("wss://streamer.finance.yahoo.com/"),
-                    new HttpMessageInvoker(httpHandler), ct).ConfigureAwait(false);
-                if (webSocket.State != WebSocketState.Open)
+                await socket.ConnectAsync(new Uri("wss://streamer.finance.yahoo.com/"),
+                    new HttpMessageInvoker(handler), ct).ConfigureAwait(false);
+                if (socket.State != WebSocketState.Open)
                     throw new WebSocketException("WebSocketState is not open.");
 
-                await webSocket.SendAsync(Encoding.UTF8.GetBytes(requestMessage), WebSocketMessageType.Text, true, ct)
+                await socket.SendAsync(Encoding.UTF8.GetBytes(requestMessage), WebSocketMessageType.Text, true, ct)
                     .ConfigureAwait(false);
 
                 while (true)
                 {
-                    WebSocketReceiveResult response = await webSocket.ReceiveAsync(responseBuffer, ct).ConfigureAwait(false);
-                    if (!response.EndOfMessage)
-                        throw new WebSocketException("The response message is not complete.");
-                    string responseMessage = Encoding.UTF8.GetString(responseBuffer, 0, response.Count);
-                    byte[] bytes = Convert.FromBase64String(responseMessage);
-                    PricingData pricingData = Serializer.Deserialize<PricingData>((ReadOnlySpan<byte>)bytes);
+                    using Stream stream = WebSocketStream.CreateReadableMessageStream(socket);
+                    using StreamReader reader = new(stream, Encoding.UTF8);
+                    string message = await reader.ReadToEndAsync(ct).ConfigureAwait(false);
+                    byte[] bytes = Convert.FromBase64String(message);
+                    PricingData pricingData = Serializer.Deserialize<PricingData>(bytes);
                     observer.OnNext(pricingData);
                 }
             }
-            catch (Exception e)
+            catch (OperationCanceledException)
             {
-                if (ct.IsCancellationRequested) // unsubscribe from observable
-                    observer.OnCompleted();
-                else
-                    observer.OnError(e);
+                observer.OnCompleted();
+            }
+            catch (Exception we)
+            {
+                observer.OnError(we);
+            }
+            finally
+            {
+                if (socket.State is WebSocketState.Open or WebSocketState.CloseSent)
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None).ConfigureAwait(false);
             }
 
             return Disposable.Create(() =>
             {
-                webSocket.Dispose();
-                httpHandler.Dispose();
+                if (disposed)
+                    return;
+                disposed = true;
+                cts.Cancel();
+                socket.Dispose();
+                handler.Dispose();
+                cts.Dispose();
             });
 
         }).Publish().RefCount();
     }
 
+
     private static string CreateRequestMessage(IEnumerable<Symbol> symbols)
     {
-        StringBuilder sb = new();
-        sb.Append("{\"subscribe\":[");
-        IEnumerable<string> symbolsList = symbols.Select(symbol => $"\"{symbol.Name}\"");
-        sb.AppendJoin(", ", symbolsList);
-        sb.Append("]}");
-        return sb.ToString();
+        IEnumerable<string> quotedSymbols = symbols.Distinct().Select(symbol => $"\"{symbol.Name}\"");
+
+        return new StringBuilder()
+        .Append("{\"subscribe\":[")
+        .AppendJoin(", ", quotedSymbols)
+        .Append("]}")
+        .ToString();
     }
 
 }

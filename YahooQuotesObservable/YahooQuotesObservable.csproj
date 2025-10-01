@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<Authors>DavidS</Authors>
-	<Version>0.1.1</Version>
-	<AssemblyVersion>0.1.1</AssemblyVersion>
-	<FileVersion>0.1.1</FileVersion>
+	<Version>0.1.2</Version>
+	<AssemblyVersion>0.1.2</AssemblyVersion>
+	<FileVersion>0.1.2</FileVersion>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<PackageIcon>worm64.png</PackageIcon>
 	<PackageProjectUrl>https://github.com/dshe/YahooQuotesObservable</PackageProjectUrl>
@@ -19,7 +19,7 @@
 	<DebugSymbols>true</DebugSymbols>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	<AnalysisMode>All</AnalysisMode>
-	<NoWarn>IDE0130;CA1031</NoWarn>	  
+	<NoWarn>IDE0130;IDE0022;IDE0021;IDE0011;IDE0046</NoWarn>	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,11 +32,11 @@
 
   <ItemGroup>
 	<PackageReference Include="NodaTime" Version="3.2.2" />
-	<PackageReference Include="System.Reactive" Version="6.0.1" />
+	<PackageReference Include="System.Reactive" Version="6.0.2" />
 	<PackageReference Include="protobuf-net" Version="3.2.56" />
-	  <PackageReference Include="protobuf-net.BuildTools" Version="3.2.52" PrivateAssets="all">
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+	<PackageReference Include="protobuf-net.BuildTools" Version="3.2.52" PrivateAssets="all">
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
   </ItemGroup>
 
 </Project>
