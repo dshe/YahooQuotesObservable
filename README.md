@@ -5,10 +5,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-7755BB.svg)](https://opensource.org/licenses/Apache-2.0) 
 
 **Streaming quotes from Yahoo Finance.**
-- **.NET 8.0** library
+- **.NET 10** library
 - simple and intuitive API
 - fault-tolerant
-- dependencies: protobuf-net
+- dependencies: protobuf-net, Reactive Extensions, NodaTime
 - note that data is available only when the particular market is open
 
 ### Installation
@@ -44,7 +44,7 @@ string symbol = "EURUSD=X";
 IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
 
 // Subscribe to the observable, wait to receive the first output, then unsubscribe.
-PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
+PricingData pricingData = await observable.FirstAsync();
 
 Assert.Equal(symbol, pricingData.Id);
 ```
