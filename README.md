@@ -1,7 +1,7 @@
 # YahooQuotesObservable&nbsp;&nbsp; 
-[![Build status](https://ci.appveyor.com/api/projects/status/kmtn827fe0e668qy?svg=true)](https://ci.appveyor.com/project/dshe/yahooquotesobservable)
+[![Build & Test](https://github.com/dshe/YahooQuotesObservable/actions/workflows/build.yml/badge.svg)](https://github.com/dshe/YahooQuotesObservable/actions/workflows/build.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/YahooQuotesObservable.svg)](https://www.nuget.org/packages/YahooQuotesObservable/) 
-[![NuGet](https://img.shields.io/nuget/dt/YahooQuotesObservable?color=orange)](https://www.nuget.org/packages/YahooQuotesObservable/) 
+[![NuGet](https://img.shields.io/nuget/dt/YahooQuotesObservable?color=blue)](https://www.nuget.org/packages/YahooQuotesObservable/) 
 [![License](https://img.shields.io/badge/license-Apache%202.0-7755BB.svg)](https://opensource.org/licenses/Apache-2.0) 
 
 **Streaming quotes from Yahoo Finance.**
