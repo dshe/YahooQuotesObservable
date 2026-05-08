@@ -21,7 +21,7 @@ jobs:
         dotnet-version: "10.0.x"
 
     - name: Restore dependencies
-      run: dotnet restore OpenFigiClient.slnx
+      run: dotnet restore YahooQuotesObservable.slnx
 
     - name: Build solution
       run: dotnet build YahooQuotesObservable.slnx --configuration Release --no-restore
