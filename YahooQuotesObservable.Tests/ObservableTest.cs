@@ -56,7 +56,6 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
         subscription.Dispose();
     }
 
-
     [Fact]
     public async Task DataExample()
     {
