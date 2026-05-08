@@ -16,9 +16,10 @@ Reactive Extensions
 
 public static class YahooQuotes
 {
+    private static readonly Uri YahooStreamerUri = new("wss://streamer.finance.yahoo.com/");
     public static IObservable<PricingData> CreateObservable(string symbol) => CreateObservable([symbol]);
-    public static IObservable<PricingData> CreateObservable(IEnumerable<string> symbols) => CreateObservable(symbols.Select(s => s.ToSymbol()));
     public static IObservable<PricingData> CreateObservable(Symbol symbol) => CreateObservable([symbol]);
+    public static IObservable<PricingData> CreateObservable(IEnumerable<string> symbols) => CreateObservable(symbols.Select(s => s.ToSymbol()));
     public static IObservable<PricingData> CreateObservable(IEnumerable<Symbol> symbols)
     {
         byte[] requestMessage = CreateRequestMessage(symbols);
@@ -34,7 +35,7 @@ public static class YahooQuotes
             socket.Options.HttpVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             try
             {
-                await socket.ConnectAsync(new Uri("wss://streamer.finance.yahoo.com/"), invoker, ct).ConfigureAwait(false);
+                await socket.ConnectAsync(YahooStreamerUri, invoker, ct).ConfigureAwait(false);
                 if (socket.State != WebSocketState.Open)
                     throw new WebSocketException("WebSocketState is not open.");
 
