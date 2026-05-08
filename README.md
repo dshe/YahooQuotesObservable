@@ -28,7 +28,7 @@ IObservable<PricingData> observable = YahooQuotes.CreateObservable(["AAPL", "EUR
 // Subscribe to the observable.
 IDisposable subscription = observable.Subscribe(pricingData =>
 {
-    Console.Write($"Id: {pricingData.Id}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
+    Console.Write($"Symbol: {pricingData.Symbol}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
 });
 
 await Task.Delay(TimeSpan.FromSeconds(10));
@@ -46,5 +46,5 @@ IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
 // Subscribe to the observable, wait to receive the first output, then unsubscribe.
 PricingData pricingData = await observable.FirstAsync();
 
-Assert.Equal(symbol, pricingData.Id);
+Assert.Equal(symbol, pricingData.Symbol);
 ```
