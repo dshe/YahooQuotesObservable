@@ -51,7 +51,7 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
             Write($"Id: {pricingData.Symbol}, Price: {pricingData.Price}, Time: {pricingData.Time.ToInstant()}");
         });
 
-        await Task.Delay(TimeSpan.FromSeconds(5));
+        await Task.Delay(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         subscription.Dispose();
     }
