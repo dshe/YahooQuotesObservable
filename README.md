@@ -1,5 +1,5 @@
 # YahooQuotesObservable&nbsp;&nbsp; 
-[![Build & Test](https://github.com/dshe/YahooQuotesObservable/actions/workflows/build.yml/badge.svg)](https://github.com/dshe/YahooQuotesObservable/actions/workflows/build.yml)
+[![Build, Test, Publish](https://github.com/dshe/YahooQuotesObservable/actions/workflows/ci.yml/badge.svg)](https://github.com/dshe/YahooQuotesObservable/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/YahooQuotesObservable.svg)](https://www.nuget.org/packages/YahooQuotesObservable/) 
 [![NuGet](https://img.shields.io/nuget/dt/YahooQuotesObservable?color=blue)](https://www.nuget.org/packages/YahooQuotesObservable/) 
 [![License](https://img.shields.io/badge/license-Apache%202.0-7755BB.svg)](https://opensource.org/licenses/Apache-2.0) 
