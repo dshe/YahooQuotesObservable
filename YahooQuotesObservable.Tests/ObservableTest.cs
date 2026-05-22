@@ -71,5 +71,6 @@ public class ObservableTests(ITestOutputHelper output) : XunitTestBase(output, L
                 Write($"{pi.Name}: {value}");
         }
     }
+
 }
 

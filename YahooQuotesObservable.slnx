@@ -1,7 +1,5 @@
 <Solution>
-  <Folder Name="/SolutionFolder/">
-    <File Path="appveyor.yml" />
-  </Folder>
+  <Folder Name="/SolutionFolder/" />
   <Project Path="YahooQuotesObservable.Tests/YahooQuotesObservable.Tests.csproj" />
   <Project Path="YahooQuotesObservable/YahooQuotesObservable.csproj" />
 </Solution>
