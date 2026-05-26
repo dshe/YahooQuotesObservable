@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 namespace YahooQuotesObservable;
 
-public sealed class YahooObserverHub : IAsyncDisposable
+public sealed class YahooQuoteHub : IAsyncDisposable
 {
     internal sealed class SymbolStream : IDisposable
     {
@@ -33,11 +33,11 @@ public sealed class YahooObserverHub : IAsyncDisposable
     public IObservable<PricingData> Aggregate => aggregate.AsObservable();
     public IEnumerable<string> Symbols => streams.Keys;
 
-    public YahooObserverHub() : this(NullLoggerFactory.Instance) { }
-    public YahooObserverHub(ILoggerFactory loggerFactory)
+    public YahooQuoteHub() : this(NullLoggerFactory.Instance) { }
+    public YahooQuoteHub(ILoggerFactory loggerFactory)
     {
         this.loggerFactory = loggerFactory;
-        logger = loggerFactory.CreateLogger<YahooObserverHub>();
+        logger = loggerFactory.CreateLogger<YahooQuoteHub>();
     }
 
     public IObservable<PricingData> CreateObservable(string symbol)
