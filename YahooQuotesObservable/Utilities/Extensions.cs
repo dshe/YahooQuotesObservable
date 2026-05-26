@@ -1,28 +1,22 @@
-﻿using NodaTime;
-using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
-namespace YahooQuotesObservable;
+﻿namespace YahooQuotesObservable;
 
 public static class Extension
 {
-    public static DateTimeOffset ToDateTimeOffset(this long ms) => DateTimeOffset.FromUnixTimeMilliseconds(ms);
-
-    // NodaTime
-    public static Instant ToInstant(this long ms) => Instant.FromUnixTimeMilliseconds(ms);
-
-    internal static object? DefaultValueOfType(this Type type) => type.IsValueType ? RuntimeHelpers.GetUninitializedObject(type) : null;
-
-    internal static void CloseAndDispose(this ClientWebSocket socket)
+    internal static void Forget(this Task task, ILogger? logger = null)
     {
-        try
-        {
-            socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "dispose", CancellationToken.None).GetAwaiter().GetResult();
-        }
-        catch (Exception)
-        {
+        _ = ObserveAsync(task, logger);
 
+        // Internal local function to handle the task
+        async static Task ObserveAsync(Task task, ILogger? logger)
+        {
+            try
+            {
+                await task.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Forget: task failed.");
+            }
         }
-        socket.Dispose();
     }
-
 }
