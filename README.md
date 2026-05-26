@@ -22,8 +22,10 @@ PM> Install-Package YahooQuotesObservable
 using System.Reactive.Linq;
 using YahooQuotesObservable;
 
+YahooObserverHub yahoo = new();
+
 // Create the observable.
-IObservable<PricingData> observable = YahooQuotes.CreateObservable(["AAPL", "EURUSD=X"]);
+IObservable<PricingData> observable = yahoo.CreateObservable("AAPL");
 
 // Subscribe to the observable.
 IDisposable subscription = observable.Subscribe(pricingData =>
@@ -41,7 +43,7 @@ subscription.Dispose();
 string symbol = "EURUSD=X";
 
 // Create the observable.
-IObservable<PricingData> observable = YahooQuotes.CreateObservable(symbol);
+IObservable<PricingData> observable = yahoo.CreateObservable(symbol);
 
 // Subscribe to the observable, wait to receive the first output, then unsubscribe.
 PricingData pricingData = await observable.FirstAsync();
