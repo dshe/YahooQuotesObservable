@@ -3,11 +3,11 @@ namespace YahooQuotesObservable.Tests;
 
 // Most of these tests require financial markets to be open.
 
-public class HubTests : XunitTestBase, IAsyncDisposable
+public class QuoteHubTests : XunitTestBase, IAsyncDisposable
 {
     public YahooQuoteHub yahooQuoteHub;
 
-    public HubTests(ITestOutputHelper output) : base(output, LogLevel.Trace)
+    public QuoteHubTests(ITestOutputHelper output) : base(output, LogLevel.Trace)
     {
         yahooQuoteHub = new(LogFactory);
     }
