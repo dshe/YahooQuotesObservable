@@ -49,4 +49,6 @@ IObservable<PricingData> observable = yahooQuoteHub.CreateObservable(symbol);
 PricingData pricingData = await observable.FirstAsync();
 
 Assert.Equal(symbol, pricingData.Symbol);
+
+await yahooQuoteHub.DisposeAsync();
 ```
