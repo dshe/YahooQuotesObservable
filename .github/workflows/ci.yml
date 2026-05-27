@@ -24,7 +24,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore --no-cache
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
