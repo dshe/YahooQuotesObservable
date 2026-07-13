@@ -1,35 +1,35 @@
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 namespace YahooQuotesObservable.Tests;
 
 // Most of these tests require financial markets to be open.
 
 public class QuoteHubTests : XunitTestBase, IAsyncDisposable
 {
-    public YahooQuoteHub yahooQuoteHub;
+    public YahooQuoteHub YahooQuoteHub;
 
     public QuoteHubTests(ITestOutputHelper output) : base(output, LogLevel.Trace)
     {
-        yahooQuoteHub = new(LogFactory);
+        YahooQuoteHub = new(LogFactory);
     }
 
     [Fact]
     public void BadSymbolTest()
     {
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => yahooQuoteHub.CreateObservable("Bad Symbol"));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => YahooQuoteHub.CreateObservable("Bad Symbol"));
         Write(exception.Message);
     }
 
     [Fact]
     public async Task UnknownSymbolTest() // Unknown symbols are ignored -> Timeout.
     {
-        IObservable<PricingData> observable = yahooQuoteHub.CreateObservable("UnknownSymbol");
+        IObservable<PricingData> observable = YahooQuoteHub.CreateObservable("UnknownSymbol");
         await Assert.ThrowsAsync<TimeoutException>(async () => await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(5)));
     }
 
     [Fact]
     public async Task NoDataTest()
     {
-        IObservable<PricingData> observable = yahooQuoteHub.CreateObservable("DFSV");
+        IObservable<PricingData> observable = YahooQuoteHub.CreateObservable("DFSV");
         await Assert.ThrowsAsync<TimeoutException>(async () => await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(5)));
     }
 
@@ -39,7 +39,7 @@ public class QuoteHubTests : XunitTestBase, IAsyncDisposable
         string symbol = "EURUSD=X";
 
         // Create the observable.
-        IObservable<PricingData> observable = yahooQuoteHub.CreateObservable(symbol);
+        IObservable<PricingData> observable = YahooQuoteHub.CreateObservable(symbol);
 
         // Subscribe to the observable, wait to receive the first output, then unsubscribe.
         PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
@@ -53,7 +53,7 @@ public class QuoteHubTests : XunitTestBase, IAsyncDisposable
     public async Task StreamingTest()
     {
         // Create the observable.
-        IObservable<PricingData> observable = yahooQuoteHub.CreateObservable("EURUSD=X");
+        IObservable<PricingData> observable = YahooQuoteHub.CreateObservable("EURUSD=X");
 
         // Subscribe to the observable.
         IDisposable subscription = observable.Subscribe(onNext: pricingData =>
@@ -71,7 +71,7 @@ public class QuoteHubTests : XunitTestBase, IAsyncDisposable
     {
         string symbol = "EURUSD=X";
 
-        IObservable<PricingData> observable = yahooQuoteHub.CreateObservable(symbol);
+        IObservable<PricingData> observable = YahooQuoteHub.CreateObservable(symbol);
         PricingData pricingData = await observable.FirstAsync().Timeout(TimeSpan.FromSeconds(10));
 
         foreach (var pi in typeof(PricingData).GetProperties())
@@ -92,6 +92,6 @@ public class QuoteHubTests : XunitTestBase, IAsyncDisposable
         await transport.DisposeAsync();
     }
 
-    public async ValueTask DisposeAsync() => await yahooQuoteHub.DisposeAsync();
+    public async ValueTask DisposeAsync() => await YahooQuoteHub.DisposeAsync();
 }
 

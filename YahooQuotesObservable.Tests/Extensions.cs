@@ -4,10 +4,15 @@ namespace YahooQuotesObservable.Tests;
 
 public static class Extension
 {
-    //public static DateTimeOffset ToDateTimeOffset(this long ms) => DateTimeOffset.FromUnixTimeMilliseconds(ms);
+    extension(long ms)
+    {
+        // NodaTime
+        public Instant ToInstant() => Instant.FromUnixTimeMilliseconds(ms);
+        public DateTimeOffset ToDateTimeOffset() => DateTimeOffset.FromUnixTimeMilliseconds(ms);
+    }
 
-    // NodaTime
-    public static Instant ToInstant(this long ms) => Instant.FromUnixTimeMilliseconds(ms);
-
-    internal static object? DefaultValueOfType(this Type type) => type.IsValueType ? RuntimeHelpers.GetUninitializedObject(type) : null;
+    extension(Type type)
+    {
+        internal object? DefaultValueOfType() => type.IsValueType ? RuntimeHelpers.GetUninitializedObject(type) : null;
+    }
 }

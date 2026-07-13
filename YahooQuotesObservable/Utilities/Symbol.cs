@@ -7,15 +7,15 @@ public readonly struct Symbol : IEquatable<Symbol>, IComparable<Symbol>
     // The default value of a struct is the value produced when all of its fields equal their default values.
     // This struct has only the string field 'name'.
     // String is a reference type with default value of null.
-    private readonly string? name;
-    private Symbol(string name) => this.name = name;
+    private readonly string? _name;
+    private Symbol(string name) => _name = name;
 
     public string Name
     {
         get
         {
-            ArgumentNullException.ThrowIfNull(name, nameof(name));
-            return name;
+            ArgumentNullException.ThrowIfNull(_name, nameof(_name));
+            return _name;
         }
     }
 
@@ -23,19 +23,19 @@ public readonly struct Symbol : IEquatable<Symbol>, IComparable<Symbol>
     {
         get
         {
-            if (name is null)
+            if (_name is null)
                 return "";
             int pos = Name.IndexOf('.', StringComparison.Ordinal);
-            if (pos == -1 || pos == name.Length - 1)
+            if (pos == -1 || pos == _name.Length - 1)
                 return "";
             return Name[(pos + 1)..];
         }
     }
 
-    public bool IsValid => name is not null;
-    public bool IsCurrency => name is not null && name.Length == 5 && name.EndsWith("=X", StringComparison.Ordinal);
-    public bool IsCurrencyRate => name is not null && name.Length == 8 && name.EndsWith("=X", StringComparison.Ordinal);
-    public bool IsStock => name is not null && !name.EndsWith("=X", StringComparison.Ordinal);
+    public bool IsValid => _name is not null;
+    public bool IsCurrency => _name is not null && _name.Length == 5 && _name.EndsWith("=X", StringComparison.Ordinal);
+    public bool IsCurrencyRate => _name is not null && _name.Length == 8 && _name.EndsWith("=X", StringComparison.Ordinal);
+    public bool IsStock => _name is not null && !_name.EndsWith("=X", StringComparison.Ordinal);
 
     public string Currency
     {
@@ -49,11 +49,11 @@ public readonly struct Symbol : IEquatable<Symbol>, IComparable<Symbol>
         }
     }
 
-    public override string ToString() => name ?? "<invalid symbol>";
-    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(name ?? "");
-    public bool Equals(Symbol other) => string.Equals(name, other.name, StringComparison.Ordinal);
+    public override string ToString() => _name ?? "<invalid symbol>";
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(_name ?? "");
+    public bool Equals(Symbol other) => string.Equals(_name, other._name, StringComparison.Ordinal);
     public override bool Equals(object? obj) => obj is Symbol symbol && Equals(symbol);
-    public int CompareTo(Symbol other) => string.CompareOrdinal(name, other.name);
+    public int CompareTo(Symbol other) => string.CompareOrdinal(_name, other._name);
     public static bool operator ==(Symbol left, Symbol right) => left.Equals(right);
     public static bool operator !=(Symbol left, Symbol right) => !(left == right);
     public static bool operator <(Symbol left, Symbol right) => left.CompareTo(right) < 0;

@@ -2,20 +2,23 @@
 
 public static class Extension
 {
-    internal static void Forget(this Task task, ILogger? logger = null)
+    extension(Task task)
     {
-        _ = ObserveAsync(task, logger);
-
-        // Internal local function to handle the task
-        async static Task ObserveAsync(Task task, ILogger? logger)
+        internal void Forget(ILogger? logger = null)
         {
-            try
+            _ = ObserveAsync(task, logger);
+
+            // Internal local function to handle the task
+            async static Task ObserveAsync(Task task, ILogger? logger)
             {
-                await task.ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                logger?.LogError(ex, "Forget: task failed.");
+                try
+                {
+                    await task.ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    logger?.LogError(ex, "Forget: task failed.");
+                }
             }
         }
     }

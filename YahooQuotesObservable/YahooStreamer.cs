@@ -12,33 +12,33 @@ namespace YahooQuotesObservable;
 
 internal sealed class YahooStreamer : IAsyncDisposable
 {
-    private static readonly Uri Uri = new("wss://streamer.finance.yahoo.com/?version=2");
-    private readonly ILogger<YahooStreamer> logger;
-    private readonly ClientWebSocket socket = new();
-    private readonly SemaphoreSlim sendLock = new(1, 1);
-    private readonly CancellationTokenSource cts = new();
-    private readonly Channel<PricingData> channel = Channel.CreateBounded<PricingData>(new BoundedChannelOptions(4096)
+    private static readonly Uri _uri = new("wss://streamer.finance.yahoo.com/?version=2");
+    private readonly ILogger<YahooStreamer> _logger;
+    private readonly ClientWebSocket _socket = new();
+    private readonly SemaphoreSlim _sendLock = new(1, 1);
+    private readonly CancellationTokenSource _cts = new();
+    private readonly Channel<PricingData> _channel = Channel.CreateBounded<PricingData>(new BoundedChannelOptions(4096)
     {
         SingleReader = true,
         SingleWriter = true,
         FullMode = BoundedChannelFullMode.DropOldest
     });
-    internal ChannelReader<PricingData> Messages => channel.Reader;
-    private int disposed;
-    private Task? receiveTask;
+    internal ChannelReader<PricingData> Messages => _channel.Reader;
+    private int _disposed;
+    private Task? _receiveTask;
 
-    internal YahooStreamer(ILoggerFactory loggerFactory) => logger = loggerFactory.CreateLogger<YahooStreamer>();
+    internal YahooStreamer(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger<YahooStreamer>();
 
     internal async Task ConnectAsync()
     {
-        logger.LogInformation("Connecting");
-        await socket.ConnectAsync(Uri, cts.Token).ConfigureAwait(false);
-        receiveTask = ReceiveLoop();
+        _logger.LogInformation("Connecting");
+        await _socket.ConnectAsync(_uri, _cts.Token).ConfigureAwait(false);
+        _receiveTask = ReceiveLoopAsync();
     }
 
-    private async Task ReceiveLoop()
+    private async Task ReceiveLoopAsync()
     {
-        CancellationToken ct = cts.Token;
+        CancellationToken ct = _cts.Token;
         byte[] buffer = ArrayPool<byte>.Shared.Rent(16 * 1024);
         try
         {
@@ -48,11 +48,11 @@ internal sealed class YahooStreamer : IAsyncDisposable
                 WebSocketReceiveResult result;
                 do
                 {
-                    result = await socket.ReceiveAsync(buffer, ct).ConfigureAwait(false);
+                    result = await _socket.ReceiveAsync(buffer, ct).ConfigureAwait(false);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        logger.LogInformation("WebSocket closed by server.");
-                        channel.Writer.TryComplete();
+                        _logger.LogInformation("WebSocket closed by server.");
+                        _channel.Writer.TryComplete();
                         return;
                     }
 #pragma warning disable CA1849 // Call async methods when in an async method
@@ -80,22 +80,22 @@ internal sealed class YahooStreamer : IAsyncDisposable
                     PricingData? pricing = Serializer.Deserialize<PricingData>(protobufStream);
                     if (pricing is null || string.IsNullOrWhiteSpace(pricing.Symbol))
                         continue;
-                    if (!channel.Writer.TryWrite(pricing))
-                        logger.LogDebug("Dropped pricing tick for {Symbol}", pricing.Symbol);
+                    if (!_channel.Writer.TryWrite(pricing))
+                        _logger.LogDebug("Dropped pricing tick for {Symbol}", pricing.Symbol);
                 }
                 catch (ProtoException)
                 {
-                    logger.LogWarning("Failed to deserialize protobuf message.");
+                    _logger.LogWarning("Failed to deserialize protobuf message.");
                     continue;
                 }
                 catch (JsonException)
                 {
-                    logger.LogWarning("Failed to parse JSON message.");
+                    _logger.LogWarning("Failed to parse JSON message.");
                     continue;
                 }
                 catch (FormatException)
                 {
-                    logger.LogWarning("Failed to format message.");
+                    _logger.LogWarning("Failed to format message.");
                     continue;
                 }
                 finally
@@ -104,17 +104,17 @@ internal sealed class YahooStreamer : IAsyncDisposable
                         ArrayPool<byte>.Shared.Return(rented);
                 }
             }
-            channel.Writer.TryComplete();
+            _channel.Writer.TryComplete();
         }
         catch (OperationCanceledException)
         {
-            logger.LogInformation("Receive loop canceled.");
-            channel.Writer.TryComplete();
+            _logger.LogInformation("Receive loop canceled.");
+            _channel.Writer.TryComplete();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected error in receive loop.");
-            channel.Writer.TryComplete(ex);
+            _logger.LogError(ex, "Unexpected error in receive loop.");
+            _channel.Writer.TryComplete(ex);
         }
         finally
         {
@@ -129,21 +129,21 @@ internal sealed class YahooStreamer : IAsyncDisposable
     {
         try
         {
-            await sendLock.WaitAsync(cts.Token).ConfigureAwait(false);
-            await socket.SendAsync(payload, WebSocketMessageType.Text, true, cts.Token).ConfigureAwait(false);
-            logger.LogDebug("Sent payload of {Length} bytes.", payload.Length);
+            await _sendLock.WaitAsync(_cts.Token).ConfigureAwait(false);
+            await _socket.SendAsync(payload, WebSocketMessageType.Text, true, _cts.Token).ConfigureAwait(false);
+            _logger.LogDebug("Sent payload of {Length} bytes.", payload.Length);
         }
         catch (OperationCanceledException) 
         {
-            logger.LogInformation("Send operation canceled.");
+            _logger.LogInformation("Send operation canceled.");
         }
         catch (WebSocketException ex) 
         {
-            logger.LogWarning(ex, "WebSocket send failed.");
+            _logger.LogWarning(ex, "WebSocket send failed.");
         }
         finally
         {
-            sendLock.Release();
+            _sendLock.Release();
         }
     }
 
@@ -157,48 +157,48 @@ internal sealed class YahooStreamer : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (Interlocked.Exchange(ref disposed, 1) != 0)
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
             return;
-        logger.LogInformation("Disposing YahooStreamer...");
+        _logger.LogInformation("Disposing YahooStreamer...");
         try
         {
-            if (socket.State is WebSocketState.Open or WebSocketState.CloseReceived)
+            if (_socket.State is WebSocketState.Open or WebSocketState.CloseReceived)
             {
                 try
                 {
-                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disposing", CancellationToken.None).ConfigureAwait(false);
-                    logger.LogInformation("WebSocket closed gracefully.");
+                    await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disposing", CancellationToken.None).ConfigureAwait(false);
+                    _logger.LogInformation("WebSocket closed gracefully.");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "WebSocket close failed, aborting.");
-                    socket.Abort();
+                    _logger.LogWarning(ex, "WebSocket close failed, aborting.");
+                    _socket.Abort();
                 }
             }
             else
             {
-                socket.Abort();
+                _socket.Abort();
             }
-            await cts.CancelAsync().ConfigureAwait(false);
-            if (receiveTask != null)
+            await _cts.CancelAsync().ConfigureAwait(false);
+            if (_receiveTask != null)
             {
                 try
                 {
-                    await receiveTask.ConfigureAwait(false);
+                    await _receiveTask.ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogDebug(ex, "Receive loop ended with exception during disposal.");
+                    _logger.LogDebug(ex, "Receive loop ended with exception during disposal.");
                 }
             }
-            channel.Writer.TryComplete();
+            _channel.Writer.TryComplete();
         }
         finally
         {
-            socket.Dispose();
-            sendLock.Dispose();
-            cts.Dispose();
-            logger.LogInformation("YahooStreamer disposed.");
+            _socket.Dispose();
+            _sendLock.Dispose();
+            _cts.Dispose();
+            _logger.LogInformation("YahooStreamer disposed.");
         }
     }
 }
