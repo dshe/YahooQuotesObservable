@@ -11,6 +11,10 @@ on:
         required: true
         default: 'false'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-and-publish:
     runs-on: windows-latest
@@ -45,9 +49,13 @@ jobs:
 
       - name: Publish to NuGet
         if: github.event.inputs.publish == 'true'
+        uses: NuGet/Authenticate@v1
+
+      - name: Push Package
+        if: github.event.inputs.publish == 'true'
         shell: pwsh
         run: |
           $pkg = Get-ChildItem ./artifacts/*.nupkg | Select-Object -First 1
           dotnet nuget push $pkg.FullName `
             --api-key ${{ secrets.NUGET_API_KEY }} `
-            --source https://api.nuget.org/v3/index.json
+            --skip-duplicate
