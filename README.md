@@ -37,6 +37,8 @@ await Task.Delay(TimeSpan.FromSeconds(20));
 
 // Unsubscribe from the observable.
 subscription.Dispose();
+
+await yahooQuoteHub.DisposeAsync();
 ```
 #### snapshot
 ```csharp
