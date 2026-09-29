@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/SolutionFolder/" />
+  <Folder Name="/SolutionFolder/">
+    <File Path="global.json" />
+  </Folder>
   <Project Path="YahooQuotesObservable.Tests/YahooQuotesObservable.Tests.csproj" />
   <Project Path="YahooQuotesObservable/YahooQuotesObservable.csproj" />
 </Solution>
