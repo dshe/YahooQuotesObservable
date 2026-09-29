@@ -147,13 +147,10 @@ internal sealed class YahooStreamer : IAsyncDisposable
         }
     }
 
-    private static byte[] CreateMessage(string action, IEnumerable<string> symbols)
-    {
-        return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Dictionary<string, IEnumerable<string>>
-            {
-                [action] = symbols
-            }));
-    }
+    private static byte[] CreateMessage(string action, IEnumerable<string> symbols) =>
+        Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Dictionary<string, IEnumerable<string>>
+            { [action] = symbols }));
+
 
     public async ValueTask DisposeAsync()
     {
