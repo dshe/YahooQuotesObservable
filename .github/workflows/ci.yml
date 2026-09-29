@@ -43,19 +43,22 @@ jobs:
           --no-restore --no-build `
           -o ./artifacts
 
-      - name: List artifacts
-        shell: pwsh
-        run: Get-ChildItem ./artifacts
-
-      - name: Publish to NuGet
+      - name: NuGet login
         if: github.event.inputs.publish == 'true'
-        uses: NuGet/Authenticate@v1
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: dshe
 
       - name: Push Package
         if: github.event.inputs.publish == 'true'
         shell: pwsh
         run: |
-          $pkg = Get-ChildItem ./artifacts/*.nupkg | Select-Object -First 1
+          $pkg = Get-ChildItem ./artifacts/*.nupkg |
+            Where-Object { $_.Name -notlike "*.symbols.nupkg" } |
+            Select-Object -First 1
+
           dotnet nuget push $pkg.FullName `
-            --api-key ${{ secrets.NUGET_API_KEY }} `
-            --skip-duplicate
+          --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" `
+          --source https://api.nuget.org/v3/index.json `
+          --skip-duplicate
